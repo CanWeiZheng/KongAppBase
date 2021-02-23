@@ -1,7 +1,12 @@
 package kong.project.base.http
 
+import io.reactivex.Flowable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kong.project.base.BuildConfig
+import kong.project.base.http.custom.BaseDownloadSubscriber
 import kong.project.base.http.custom.CustomGsonConverterFactory
+import kong.project.base.http.custom.DownloadTransformer
 import kong.project.base.util.KLog
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -15,6 +20,7 @@ import java.util.concurrent.TimeUnit
  */
 open class BaseNetwork {
     val retrofit = getRetrofit()
+    private val downloadService by lazy { Companion.getDownloadService(this) }
 
     companion object {
         private fun getOkHttpClient(): OkHttpClient {
@@ -24,7 +30,7 @@ open class BaseNetwork {
                 }
             }).also {
                 if (BuildConfig.DEBUG) {
-                    it.level = HttpLoggingInterceptor.Level.BODY
+                    it.level = HttpLoggingInterceptor.Level.BASIC
                 } else {
                     it.level = HttpLoggingInterceptor.Level.NONE
                 }
@@ -44,10 +50,22 @@ open class BaseNetwork {
                 .addConverterFactory(CustomGsonConverterFactory.create())
                 .build()
         }
+
+        private fun getDownloadService(baseNetwork: BaseNetwork): DownloadService {
+            return baseNetwork.retrofit.create(DownloadService::class.java)
+        }
     }
 
-    fun download() {
-
+    fun download(
+        url: String,
+        downloadDirectory: String,
+        baseDownloadSubscriber: BaseDownloadSubscriber<Any>
+    ) {
+        downloadService.download(url).flatMap {
+            Flowable.just(it)
+                .compose(DownloadTransformer(it.raw().request.url.toString(), downloadDirectory))
+        }.observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io()).subscribe(baseDownloadSubscriber)
     }
 
 
