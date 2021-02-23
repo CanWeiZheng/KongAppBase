@@ -1,17 +1,21 @@
 package kong.project.base.http
 
+import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kong.project.base.BuildConfig
-import kong.project.base.http.custom.BaseDownloadSubscriber
-import kong.project.base.http.custom.CustomGsonConverterFactory
-import kong.project.base.http.custom.DownloadTransformer
+import kong.project.base.http.custom.*
 import kong.project.base.util.KLog
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
+import java.io.File
 import java.util.concurrent.TimeUnit
 
 /**
@@ -51,8 +55,8 @@ open class BaseNetwork {
                 .build()
         }
 
-        private fun getDownloadService(baseNetwork: BaseNetwork): DownloadService {
-            return baseNetwork.retrofit.create(DownloadService::class.java)
+        private fun getDownloadService(baseNetwork: BaseNetwork): BaseService {
+            return baseNetwork.retrofit.create(BaseService::class.java)
         }
     }
 
@@ -66,6 +70,24 @@ open class BaseNetwork {
                 .compose(DownloadTransformer(it.raw().request.url.toString(), downloadDirectory))
         }.observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io()).subscribe(baseDownloadSubscriber)
+    }
+
+    fun upload(url:String,uploadParamsName:String,file: File,params:MutableMap<String,Any>,baseUploadSubscriber: BaseUploadSubscriber<Any>){
+        val uploadOnSubscribe = UploadOnSubscribe()
+        val requestFile = UploadRequestBody(file)
+        requestFile.setUploadOnSubscribe(uploadOnSubscribe)
+        val part = MultipartBody.Part.createFormData(uploadParamsName, file.name, requestFile)
+        val partMap = mutableMapOf<String,RequestBody>()
+        params?.let {
+            it.entries.forEach {entry->
+                partMap[entry.key] =
+                    entry.value.toString().toRequestBody("multipart/form-data".toMediaTypeOrNull())
+            }
+        }
+        val progressFlowable = Flowable.create(uploadOnSubscribe, BackpressureStrategy.BUFFER)
+        val upload = downloadService.upload(url,part,partMap)
+        Flowable.merge(progressFlowable, upload).observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io()).subscribe(baseUploadSubscriber)
     }
 
 
