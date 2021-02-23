@@ -23,7 +23,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this,R.layout.activity_main)
         KLog.showLog(BuildConfig.DEBUG)
-        Log.d("kong", "dp2px----${UtilUnit.dp2Px(this, 20f)}")
         binding.requestBtn.setOnClickListener {
             NetworkHelper.getService().getCityList().observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
@@ -40,14 +39,11 @@ class MainActivity : AppCompatActivity() {
                 }
                 override fun onProgress(progress: Int) {
                     super.onProgress(progress)
-                    KLog.log("progress---$progress")
                     binding.progressTv.text = "进度$progress"
                 }
 
                 override fun onDownloadSuccess(path: String) {
                     super.onDownloadSuccess(path)
-                    KLog.log("onDownloadSuccess------$path")
-
                     upload(path)
                 }
             })

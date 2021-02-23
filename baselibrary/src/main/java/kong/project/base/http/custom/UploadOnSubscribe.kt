@@ -15,7 +15,6 @@ class UploadOnSubscribe : FlowableOnSubscribe<Any> {
     }
 
     fun onRead(progress: Int) {
-//        KLog.log("progress==$progress")
         if (progress == 100) {
             flowableEmitter?.onNext(progress)
             flowableEmitter?.onComplete()

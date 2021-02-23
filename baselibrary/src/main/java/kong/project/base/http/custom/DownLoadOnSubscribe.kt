@@ -2,7 +2,6 @@ package kong.project.base.http.custom
 
 import io.reactivex.FlowableEmitter
 import io.reactivex.FlowableOnSubscribe
-import kong.project.base.util.KLog
 import okhttp3.ResponseBody
 import okio.*
 import java.io.File
@@ -109,7 +108,6 @@ class DownLoadOnSubscribe(
         return object : ForwardingSource(source) {
             override fun read(sink: Buffer, byteCount: Long): Long {
                 val read = super.read(sink, byteCount)
-                KLog.log("read====${read}")
                 onRead(read)
                 return read
             }

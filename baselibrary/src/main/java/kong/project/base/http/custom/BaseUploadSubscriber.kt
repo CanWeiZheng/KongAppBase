@@ -2,7 +2,6 @@ package kong.project.base.http.custom
 
 import io.reactivex.disposables.Disposable
 import io.reactivex.subscribers.ResourceSubscriber
-import kong.project.base.util.KLog
 import retrofit2.HttpException
 import java.io.IOException
 import java.net.ConnectException
@@ -43,7 +42,6 @@ abstract class BaseUploadSubscriber<T> : ResourceSubscriber<T>() {
     override fun onComplete() {}
     open fun onNormalError(e: Throwable, uiMsg: String) {
         e.printStackTrace()
-        KLog.log(e.message!!)
         onError(message = uiMsg)
     }
 
