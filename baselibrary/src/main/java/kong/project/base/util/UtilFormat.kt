@@ -49,6 +49,9 @@ object UtilFormat {
 
     /**
      * 数值格式化
+     * @param
+     * int 保留整数的位数
+     * decimal 保留小数的位数
      */
     fun numFormat(value: Any, int: Int = 0, decimal: Int = 0): String {
         if (value is Int || value is Long || value is Float || value is Double) {
@@ -78,6 +81,7 @@ object UtilFormat {
 
     /**
      * 时间戳转时间格式
+     * @param pattern 时间格式
      */
     fun timeFormat(timestamp: Long, pattern: String = "yyyy-MM-dd HH:mm:ss"): String {
         System.currentTimeMillis()
