@@ -1,4 +1,4 @@
-package com.kongappbase
+package com.kongappbase.model
 
 import com.google.gson.annotations.SerializedName
 

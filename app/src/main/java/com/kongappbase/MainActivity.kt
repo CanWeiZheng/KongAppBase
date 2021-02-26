@@ -9,6 +9,9 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.databinding.DataBindingUtil
 import com.kongappbase.databinding.ActivityMainBinding
+import com.kongappbase.http.NetworkHelper
+import com.kongappbase.model.CityListInfo
+import com.kongappbase.model.HttpResponseInfo
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -23,10 +26,15 @@ class MainActivity : AppCompatActivity() {
     private var mScale = 1
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        binding = DataBindingUtil.setContentView(this,
+            R.layout.activity_main
+        )
         KLog.showLog(BuildConfig.DEBUG)
         binding.unitBtn.setOnClickListener {
             startActivity(Intent(this, UnitActivity::class.java))
+        }
+        binding.dialogBtn.setOnClickListener {
+            startActivity(Intent(this,DialogActivity::class.java))
         }
 
 
@@ -59,32 +67,8 @@ class MainActivity : AppCompatActivity() {
                     }
                 })
         }
-        binding.bigView.setInputStream(assets.open("guangzhou.png"))
-
-        binding.zoomInBtn.setOnClickListener {
-            mScale += 1
-            getBigImage(distance * mScale)
-        }
-        binding.zoomOutBtn.setOnClickListener {
-            mScale -= 1
-            getBigImage(distance * mScale)
-        }
-        getBigImage(distance * mScale)
 
     }
-
-    var bitmapRegionDecoder: BitmapRegionDecoder? = null
-    val distance = 200
-    fun getBigImage(distance: Int) {
-        if (bitmapRegionDecoder == null)
-            bitmapRegionDecoder = BitmapRegionDecoder.newInstance(assets.open("card.png"), false)
-        val option = BitmapFactory.Options()
-        option.inPreferredConfig = Bitmap.Config.RGB_565
-        val rect = Rect(distance, 0, distance + 200, 500)
-        val bitmap = bitmapRegionDecoder!!.decodeRegion(rect, option)
-        binding.imageView.setImageBitmap(bitmap)
-    }
-
 
     fun upload(path: String) {
         val paramsMap = mutableMapOf<String, Any>()

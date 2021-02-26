@@ -1,4 +1,4 @@
-package com.kongappbase;
+package com.kongappbase.ui;
 
 import android.content.Context;
 import android.graphics.Bitmap;

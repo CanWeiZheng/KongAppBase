@@ -1,4 +1,4 @@
-package com.kongappbase
+package com.kongappbase.constant
 
 /**
  * @author: Kong

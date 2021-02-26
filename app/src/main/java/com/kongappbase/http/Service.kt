@@ -1,5 +1,8 @@
-package com.kongappbase
+package com.kongappbase.http
 
+import com.kongappbase.constant.ConstantUrl
+import com.kongappbase.model.CityListInfo
+import com.kongappbase.model.HttpResponseInfo
 import io.reactivex.Flowable
 import okhttp3.ResponseBody
 import retrofit2.Response

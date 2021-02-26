@@ -1,4 +1,4 @@
-package com.kongappbase
+package com.kongappbase.http
 
 import kong.project.base.http.BaseNetwork
 
