@@ -1,5 +1,6 @@
 package com.kongappbase
 
+import android.graphics.Color
 import android.os.Bundle
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.FragmentActivity

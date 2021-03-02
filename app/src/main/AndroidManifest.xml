@@ -17,7 +17,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".UnitActivity"/>
-        <activity android:name=".DialogActivity"/>
+        <activity android:name=".DialogActivity" />
     </application>
 
 </manifest>
