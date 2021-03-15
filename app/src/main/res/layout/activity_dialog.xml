@@ -143,16 +143,17 @@
         <!--                android:clipToPadding="false" />-->
 
         <androidx.core.widget.NestedScrollView
+            android:id="@+id/scrollView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:overScrollMode="never"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <TextView
+            <LinearLayout
+                android:id="@+id/containerLayout"
+                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#168CC3"
-                android:clipToPadding="false" />
+                android:layout_height="match_parent"  />
 
         </androidx.core.widget.NestedScrollView>
 

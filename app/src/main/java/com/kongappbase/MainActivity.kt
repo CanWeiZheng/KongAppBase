@@ -34,6 +34,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, UnitActivity::class.java))
         }
         binding.dialogBtn.setOnClickListener {
+            KLog.log(System.currentTimeMillis().toString())
             startActivity(Intent(this,DialogActivity::class.java))
         }
 
@@ -68,6 +69,7 @@ class MainActivity : AppCompatActivity() {
                 })
         }
 
+        binding.progressTv.text = "VersionCode----${BuildConfig.VERSION_CODE}"
     }
 
     fun upload(path: String) {
