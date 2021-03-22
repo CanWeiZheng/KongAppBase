@@ -15,6 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="单位和格式转换" />
+
         <Button
             android:id="@+id/dialogBtn"
             android:layout_width="match_parent"
@@ -35,15 +36,55 @@
             android:id="@+id/requestBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="http Request"  />
+            android:text="http Request" />
 
         <Button
             android:id="@+id/downloadBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Download"  />
+            android:text="Download" />
+
+        <Button
+            android:id="@+id/animatorBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Animator" />
 
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/bg_dial"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/pointerIv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="37dp"
+                android:src="@mipmap/ic_pointer"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_marginEnd="20dp"
+            android:layout_marginStart="20dp"
+            android:max="100"
+            android:progress="70"
+            android:secondaryProgress="50"
+            style="@style/MyProgressBar"
+            android:progressDrawable="@drawable/layer_bg_progress"
+            android:layout_width="match_parent"
+            android:layout_height="13dp"/>
 
 
     </LinearLayout>

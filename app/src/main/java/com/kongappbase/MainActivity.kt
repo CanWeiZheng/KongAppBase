@@ -1,5 +1,9 @@
 package com.kongappbase
 
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
+import android.app.AlertDialog
+import android.app.DatePickerDialog
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -7,11 +11,13 @@ import android.graphics.BitmapRegionDecoder
 import android.graphics.Rect
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.DatePicker
 import androidx.databinding.DataBindingUtil
 import com.kongappbase.databinding.ActivityMainBinding
 import com.kongappbase.http.NetworkHelper
 import com.kongappbase.model.CityListInfo
 import com.kongappbase.model.HttpResponseInfo
+import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -20,13 +26,15 @@ import kong.project.base.http.custom.BaseSubscriber
 import kong.project.base.http.custom.BaseUploadSubscriber
 import kong.project.base.util.KLog
 import java.io.File
+import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
     private var mScale = 1
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this,
+        binding = DataBindingUtil.setContentView(
+            this,
             R.layout.activity_main
         )
         KLog.showLog(BuildConfig.DEBUG)
@@ -35,7 +43,7 @@ class MainActivity : AppCompatActivity() {
         }
         binding.dialogBtn.setOnClickListener {
             KLog.log(System.currentTimeMillis().toString())
-            startActivity(Intent(this,DialogActivity::class.java))
+            startActivity(Intent(this, DialogActivity::class.java))
         }
 
 
@@ -70,6 +78,41 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.progressTv.text = "VersionCode----${BuildConfig.VERSION_CODE}"
+
+        binding.animatorBtn.setOnClickListener {
+//            pointerAnim()
+//            val picker = DatePickerDialog(this,0, null,2021,2,22)
+//            picker.show()
+            Flowable.intervalRange(6, 5, 0, 1, TimeUnit.SECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    KLog.log("it---$it")
+                    binding.progressBar.progress = it.toInt()*10
+                   progressAnim((it.toInt())*10)
+                }
+
+
+        }
+    }
+
+    private fun progressAnim(value :Int) {
+        val animator = ValueAnimator.ofInt(0, value)
+        animator.duration = 1000
+        animator.addUpdateListener {
+            binding.progressBar.secondaryProgress = it.animatedValue as Int
+        }
+        animator.start()
+    }
+
+    private fun pointerAnim() {
+        val animator = ObjectAnimator.ofFloat(binding.pointerIv, "rotation", 0f, 120f, 50f)
+        binding.pointerIv.pivotX = (binding.pointerIv.width / 2).toFloat()
+        binding.pointerIv.pivotY = binding.pointerIv.height.toFloat() / 165 * 130
+//        binding.pointerIv.pivotY = binding.pointerIv.height.toFloat()
+        animator.duration = 5000
+        animator.startDelay = 200
+        animator.start()
+
     }
 
     fun upload(path: String) {
