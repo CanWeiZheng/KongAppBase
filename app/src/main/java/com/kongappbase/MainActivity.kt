@@ -5,13 +5,17 @@ import android.animation.ValueAnimator
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.BitmapRegionDecoder
-import android.graphics.Rect
+import android.graphics.*
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.*
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
+import android.text.style.URLSpan
+import android.view.View
+import android.view.ViewTreeObserver
 import android.widget.DatePicker
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.kongappbase.databinding.ActivityMainBinding
 import com.kongappbase.http.NetworkHelper
@@ -80,22 +84,101 @@ class MainActivity : AppCompatActivity() {
         binding.progressTv.text = "VersionCode----${BuildConfig.VERSION_CODE}"
 
         binding.animatorBtn.setOnClickListener {
-//            pointerAnim()
+            pointerAnim()
 //            val picker = DatePickerDialog(this,0, null,2021,2,22)
 //            picker.show()
             Flowable.intervalRange(6, 5, 0, 1, TimeUnit.SECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     KLog.log("it---$it")
-                    binding.progressBar.progress = it.toInt()*10
-                   progressAnim((it.toInt())*10)
+                    binding.progressBar.progress = it.toInt() * 10
+                    progressAnim((it.toInt()) * 10)
                 }
-
-
         }
+        val HTML_TEXT =
+            "<p><font size=\"3\" color=\"red\">设置了字号和颜色</font></p>" +
+                    "<b><font size=\"5\" color=\"blue\">设置字体加粗 蓝色 5号</font></font></b></br>" +
+                    "<h1><a href=\"http://magiclen.org/\">这个是H1标签</a></h1></br>" +
+                    "<p>这里显示图片：</p><img src=\"https://img0.pconline.com.cn/pconline/1808/06/11566885_13b_thumb.jpg\""
+        binding.linkTv.text = Html.fromHtml(HTML_TEXT)
+        binding.linkTv.movementMethod = LinkMovementMethod.getInstance()
+        val str = binding.linkTv.text
+        if (str is Spannable) {
+            val end = str.length
+            val sp = binding.linkTv.text as Spannable
+            val spans = sp.getSpans(0, end, URLSpan::class.java)
+            val style = SpannableStringBuilder(str)
+            style.clearSpans()
+            for (url in spans) {
+                style.setSpan(object : ClickableSpan() {
+                    override fun updateDrawState(ds: TextPaint) {
+                        ds.color = ContextCompat.getColor(this@MainActivity, R.color.purple_500)
+                        ds.isUnderlineText = false
+//                        super.updateDrawState(ds)
+                    }
+
+                    override fun onClick(p0: View) {
+                        KLog.log("onClick------")
+                    }
+                }, sp.getSpanStart(url), sp.getSpanEnd(url), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+            binding.linkTv.highlightColor = Color.TRANSPARENT
+            binding.linkTv.text = style
+        }
+        binding.root.viewTreeObserver.addOnPreDrawListener(object :
+            ViewTreeObserver.OnPreDrawListener {
+            override fun onPreDraw(): Boolean {
+                resetPointer()
+                binding.pointerIv.viewTreeObserver.removeOnPreDrawListener(this)
+                return true
+            }
+        })
+
+
     }
 
-    private fun progressAnim(value :Int) {
+    /**
+     * html  带有<font>标签的文本
+     */
+    private fun getClickableHtml(html: String?): CharSequence {
+        val spannedHtml: Spanned = Html.fromHtml(html)
+        val clickableHtmlBuilder = SpannableStringBuilder(spannedHtml)
+        val spans = clickableHtmlBuilder.getSpans(0, spannedHtml.length, URLSpan::class.java)
+        for (value in spans) {
+            KLog.log("value----${value.url}")
+            setLinkClickable(clickableHtmlBuilder, value);
+        }
+
+        return clickableHtmlBuilder
+    }
+
+
+    /**
+     * 捕获<a>标签点击事件
+     */
+    private fun setLinkClickable(clickableHtmlBuilder: SpannableStringBuilder, urlSpan: URLSpan?) {
+        val start = clickableHtmlBuilder.getSpanStart(urlSpan)
+        val end = clickableHtmlBuilder.getSpanEnd(urlSpan)
+        val flags = clickableHtmlBuilder.getSpanEnd(urlSpan)
+        val clickableSpan = object : ClickableSpan() {
+            override fun onClick(p0: View) {
+                val url = urlSpan?.url
+                KLog.log("url----$url")
+            }
+
+            override fun updateDrawState(ds: TextPaint) {
+                //设置颜色
+                ds.color = Color.parseColor("#000000")
+                //设置是否要下划线
+                ds.isUnderlineText = false
+            }
+
+        }
+        clickableHtmlBuilder.setSpan(clickableSpan, start, end, flags)
+    }
+
+
+    private fun progressAnim(value: Int) {
         val animator = ValueAnimator.ofInt(0, value)
         animator.duration = 1000
         animator.addUpdateListener {
@@ -104,12 +187,22 @@ class MainActivity : AppCompatActivity() {
         animator.start()
     }
 
+    private fun resetPointer() {
+//        val animator = ObjectAnimator.ofFloat(binding.pointerIv, "rotation", -75f)
+        binding.pointerIv.pivotX = (binding.pointerIv.width / 2).toFloat()
+        binding.pointerIv.pivotY = binding.pointerIv.height.toFloat() / 165 * 130
+        binding.pointerIv.rotation = -125f
+//        binding.pointerIv.pivotY = binding.pointerIv.height.toFloat()
+//        animator.duration = 100
+//        animator.start()
+    }
+
     private fun pointerAnim() {
-        val animator = ObjectAnimator.ofFloat(binding.pointerIv, "rotation", 0f, 120f, 50f)
+        val animator = ObjectAnimator.ofFloat(binding.pointerIv, "rotation", binding.pointerIv.rotation, 120f, -75f, 0f)
         binding.pointerIv.pivotX = (binding.pointerIv.width / 2).toFloat()
         binding.pointerIv.pivotY = binding.pointerIv.height.toFloat() / 165 * 130
 //        binding.pointerIv.pivotY = binding.pointerIv.height.toFloat()
-        animator.duration = 5000
+        animator.duration = 3000
         animator.startDelay = 200
         animator.start()
 
