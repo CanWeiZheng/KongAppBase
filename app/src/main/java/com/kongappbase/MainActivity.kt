@@ -1,10 +1,12 @@
 package com.kongappbase
 
+import android.Manifest
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.*
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -30,6 +32,7 @@ import kong.project.base.http.custom.BaseSubscriber
 import kong.project.base.http.custom.BaseUploadSubscriber
 import kong.project.base.util.KLog
 import java.io.File
+import java.security.Permission
 import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
@@ -133,9 +136,48 @@ class MainActivity : AppCompatActivity() {
                 return true
             }
         })
+        binding.locationBtn.setOnClickListener {
+            testLocation()
+        }
 
 
     }
+
+    fun testLocation() {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_DENIED
+        ) {
+            KLog.log("没有权限")
+            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 111)
+        } else {
+            KLog.log("有权限")
+
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        KLog.log("permissions==" + permissions.toString())
+        permissions.forEach {
+            KLog.log("it----$it")
+            if (it==Manifest.permission.ACCESS_FINE_LOCATION){
+                if (!shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    KLog.log("不再询问")
+                }
+            }
+        }
+        KLog.log("grantResults==" + grantResults.toString())
+        grantResults.forEach {
+            KLog.log("grantResult======$it")
+        }
+    }
+
 
     /**
      * html  带有<font>标签的文本
@@ -198,7 +240,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun pointerAnim() {
-        val animator = ObjectAnimator.ofFloat(binding.pointerIv, "rotation", binding.pointerIv.rotation, 120f, -75f, 0f)
+        val animator = ObjectAnimator.ofFloat(
+            binding.pointerIv,
+            "rotation",
+            binding.pointerIv.rotation,
+            120f,
+            -75f,
+            0f
+        )
         binding.pointerIv.pivotX = (binding.pointerIv.width / 2).toFloat()
         binding.pointerIv.pivotY = binding.pointerIv.height.toFloat() / 165 * 130
 //        binding.pointerIv.pivotY = binding.pointerIv.height.toFloat()
